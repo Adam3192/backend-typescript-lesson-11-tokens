@@ -58,3 +58,4 @@ export const getUser: RequestHandler = async (req, res, next) => {
      res.status(401).send();
  }
 }
+

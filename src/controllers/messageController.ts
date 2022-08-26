@@ -1,5 +1,7 @@
 import { RequestHandler } from "express";
 import { Message } from "../models/message";
+import { User } from "../models/user";
+import { verifyUser } from "../services/auth";
 
 export const getAllMessages: RequestHandler = async (req, res, next) => {
     let messages = await Message.findAll();
@@ -7,7 +9,15 @@ export const getAllMessages: RequestHandler = async (req, res, next) => {
 }
 
 export const createMessage: RequestHandler = async (req, res, next) => {
+    let user: User | null = await verifyUser(req);
+
+    if (!user) {
+        return res.status(403).send();
+    }
+    
     let newMessage: Message = req.body;
+    newMessage.userId = user.userId;
+    
     if (newMessage.message) {
         let created = await Message.create(newMessage);
         res.status(201).json(created);
